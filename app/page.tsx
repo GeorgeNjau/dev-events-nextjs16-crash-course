@@ -1,6 +1,9 @@
 import ExploreBtn from "@/components/ExploreBtn";
 import EventCard from "@/components/EventCard";
 import {events} from "@/lib/constants";
+import posthog from "posthog-js"
+
+posthog.capture("my event", { property: 'value'})
 
 const Page = () => {
     return(

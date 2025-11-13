@@ -7,10 +7,6 @@ interface MongooseCache {
 }
 
 // Extend the global namespace to include our mongoose cache
-declare global {
-  // eslint-disable-next-line no-var
-  var mongoose: MongooseCache | undefined;
-}
 
 // Get the MongoDB URI from environment variables
 const MONGODB_URI = process.env.MONGODB_URI;
@@ -23,12 +19,11 @@ if (!MONGODB_URI) {
 }
 
 // Initialize the cached connection object
-// In development, use a global variable to preserve the connection across hot reloads
-// In production, the cache is scoped to this module
-let cached: MongooseCache = global.mongoose || { conn: null, promise: null };
-
-if (!global.mongoose) {
-  global.mongoose = cached;
+// Use a globalThis-based cache to preserve the connection across hot reloads in development
+const globalAny = globalThis as any;
+let cached: MongooseCache = globalAny.__mongooseCache || { conn: null, promise: null };
+if (!globalAny.__mongooseCache) {
+  globalAny.__mongooseCache = cached;
 }
 
 /**
@@ -48,7 +43,7 @@ async function connectDB(): Promise<typeof mongoose> {
       bufferCommands: false, // Disable command buffering for better error handling
     };
 
-    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
+    cached.promise = mongoose.connect(MONGODB_URI!, opts).then((mongoose) => {
       return mongoose;
     });
   }

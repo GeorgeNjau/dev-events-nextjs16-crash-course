@@ -1,21 +1,22 @@
 import ExploreBtn from "@/components/ExploreBtn";
 import EventCard from "@/components/EventCard";
-import {events} from "@/lib/constants";
-import posthog from "posthog-js"
 import {IEvent} from "@/database";
 import {Suspense} from 'react';
-
-posthog.capture("my events", {property: 'value'})
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 async function EventsList() {
     const response = await fetch(`${BASE_URL}/api/events`);
+
+    if(!response.ok){
+        return <p>Failed to load events.</p>
+    }
+
     const {events} = await response.json();
 
     return (<ul className="events">
         {events && events.length > 0 && events.map((event: IEvent) => (
-            <li key={event.title}>
+            <li key={event.title || event.id}>
                 <EventCard {...event} />
             </li>
         ))}

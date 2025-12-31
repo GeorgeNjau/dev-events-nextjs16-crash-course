@@ -34,11 +34,27 @@ const EventTags = ({ tags} : {tags: string[]}) => (
 async function EventDetails({params}: {params: Promise<{slug: string}>}) {
     const {slug} = await params;
     const request = await fetch(`${BASE_URL}/api/events/${slug}`);
-    const { event: {description, image, overview, date, time, location, mode, agenda, audience, tags, organizer} } = await request.json();
 
-    if(!description) return notFound();
+    if(!request.ok) {
+        return notFound();
+    }
+
+    const { event } = await request.json();
+
+    if(!event || !event.description) return notFound();
+
+    const {description, image, overview, date, time, location, mode, agenda, audience, tags, organizer} = event;
 
     const bookings = 10;
+
+    const parseJsonSafely = (value: string | undefined): string[] => {
+        if (!value) return [];
+        try {
+            return JSON.parse(value);
+        } catch {
+            return [];
+        }
+    };
 
     return(
         <section id="event">
@@ -51,7 +67,7 @@ async function EventDetails({params}: {params: Promise<{slug: string}>}) {
 
                 {/* Left side - Event Content */}
                 <div className="content">
-                    <img src={image} alt="Event banner" width={800} height={800} className="banner" />
+                    <Image src={image} alt="Event banner" width={800} height={800} className="banner" />
 
                     <section className="flex-col-gap-2">
                         <h2>Overview</h2>
@@ -68,14 +84,14 @@ async function EventDetails({params}: {params: Promise<{slug: string}>}) {
                         <EventDetailItem icon="/icons/audience.svg" alt="audience" label={audience}/>
                     </section>
 
-                    <EventAgenda agendaItems={JSON.parse(agenda[0])} />
+                    <EventAgenda agendaItems={parseJsonSafely(agenda?.[0])} />
 
                     <section className="flex-col-gap-2">
                         <h2>About the Organizer</h2>
                         <p>{organizer}</p>
                     </section>
 
-                    <EventTags tags={JSON.parse((tags[0]))} />
+                    <EventTags tags={parseJsonSafely(tags?.[0])} />
 
                 </div>
 

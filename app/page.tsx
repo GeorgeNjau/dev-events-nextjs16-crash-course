@@ -16,7 +16,7 @@ async function EventsList() {
 
     return (<ul className="events">
         {events && events.length > 0 && events.map((event: IEvent) => (
-            <li key={event.title || event.id}>
+            <li key={event.title || event.id} className="list-none">
                 <EventCard {...event} />
             </li>
         ))}

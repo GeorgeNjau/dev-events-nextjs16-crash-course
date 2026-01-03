@@ -2,10 +2,14 @@ import ExploreBtn from "@/components/ExploreBtn";
 import EventCard from "@/components/EventCard";
 import {IEvent} from "@/database";
 import {Suspense} from 'react';
+import {cacheLife} from "next/cache";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 async function EventsList() {
+    'use cache';
+    cacheLife('hours');
+
     const response = await fetch(`${BASE_URL}/api/events`);
 
     if(!response.ok){

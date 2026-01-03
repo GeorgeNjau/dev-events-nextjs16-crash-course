@@ -28,8 +28,19 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({message: 'Invalid file type. Only JPEG, PNG, WebP, and GIF are allowed.'}, {status: 400});
         }
 
-        let tags = JSON.parse(formData.get('tags') as string);
-        let agenda = JSON.parse(formData.get('agenda') as string);
+        let tags, agenda;
+
+        try {
+            tags = JSON.parse(formData.get('tags') as string);
+        } catch (e) {
+            return NextResponse.json({message: 'Invalid tags format. Expected JSON array.'}, {status: 400});
+        }
+
+        try {
+            agenda = JSON.parse(formData.get('agenda') as string);
+        } catch (e) {
+            return NextResponse.json({message: 'Invalid agenda format. Expected JSON array.'}, {status: 400});
+        }
 
         const arrayBuffer = await file.arrayBuffer();
         const buffer = Buffer.from(arrayBuffer);

@@ -145,9 +145,6 @@ EventSchema.pre('save', function (next) {
   next();
 });
 
-// Create unique index on slug
-EventSchema.index({ slug: 1 }, { unique: true });
-
 // Use existing model if it exists (for Next.js hot reload), otherwise create new one
 const Event = models.Event || model<IEvent>('Event', EventSchema);
 
